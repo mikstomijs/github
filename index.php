@@ -72,6 +72,8 @@ EOF;
 
 
 </form>
+
+<label>Esi jau pierakstījies? Ej uz <a href="login.php">login</a></label>
 <?php 
 
 
@@ -84,7 +86,7 @@ EOF;
     $password = $_POST['password'];
     echo $name;
 
-
+   $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 
 
@@ -93,7 +95,7 @@ EOF;
 
     $sql =<<<EOF
     INSERT OR IGNORE INTO LOGININFO (ID,NAME,SURNAME,EMAIL,PASSWORD)
-    VALUES ('$count','$name','$surname','$email','$password');
+    VALUES ('$count','$name','$surname','$email','$hashed_password');
 EOF;
 
 
