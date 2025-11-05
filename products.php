@@ -8,8 +8,6 @@ session_start();
    $db = new MyDB();
    if(!$db) {
       echo $db->lastErrorMsg();
-   } else {
-      echo "Opened database successfully\n";
    }
 
    $tableExists = $db->querySingle("SELECT name FROM sqlite_master WHERE type='table' AND name='PRODUCTS'");
@@ -29,9 +27,7 @@ EOF;
       $ret = $db->exec($sql);
       if(!$ret){
          echo $db->lastErrorMsg();
-      } else {
-         echo "Table created successfully\n";
-      }
+      } 
    }
 
 ?>
@@ -76,41 +72,14 @@ if(isset($_POST['logout'])) {
     <div class="container_filter">
 <?php
 
-   $db2 = new MyDB();
-   if(!$db2) {
-      echo $db2->lastErrorMsg();
-   } else {
-      echo "Opened database successfully\n";
-   }
 
-   $tableExists = $db2->querySingle("SELECT name FROM sqlite_master WHERE type='table' AND name='CATEGORIES'");
-   if ($tableExists) {
-      echo "asdas";  
-   }
+   
+$res = $db->query("SELECT DISTINCT CATEGORY FROM PRODUCTS");
 
-
-
-   if(!$tableExists) {
-      $sql =<<<EOF
-      CREATE TABLE CATEGORIES
-      (ID INTEGER PRIMARY KEY AUTOINCREMENT,
-      CATEGORY TEXT);
-      
-EOF;
-
-      $ret = $db2->exec($sql);
-      if(!$ret){
-         echo $db2->lastErrorMsg();
-      } else {
-         echo "Table created successfully\n";
-      }
-   }
-
-$res2 = $db2->query("SELECT * FROM CATEGORIES");
-
-while($row = $res2->fetchArray(SQLITE3_ASSOC) ) {
+while($row = $res->fetchArray(SQLITE3_ASSOC) ) {
 $category = htmlspecialchars($row['CATEGORY']);
-var_dump($row);
+$categoryTrim = str_replace('_', ' ', $category);
+echo $categoryTrim .  "<input type='checkbox' name='filter' id=$category>" . "<br>"  ;
 
 }
 
@@ -121,19 +90,34 @@ var_dump($row);
     <div class="container_products">
 <?php 
 
+
+
 $res = $db->query("SELECT * FROM PRODUCTS");
 while($row = $res->fetchArray(SQLITE3_ASSOC) ) {
     $id = $row['ID'];
     $name = htmlspecialchars($row['NAME']);
     $price = htmlspecialchars($row['PRICE']);
+    $category = htmlspecialchars($row['CATEGORY']);
 
-    echo '<a class="product-card" href="product.php?id=' . urlencode($id) . '">';
+    echo '<a class="product-card" href="product.php?id=' . urlencode($id) . '" id="'. $category . '">';
     echo '  <div class="card-inner">';
     echo "    <h3>$name</h3>";
     echo "    <div class='price'>$price</div>";
     echo '  </div>';
     echo '</a>';
 }
+
+
+
+
+
+
+
+
+
+
+
+
 ?>
 </div>
 
