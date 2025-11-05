@@ -1,4 +1,6 @@
 <?php
+session_start();
+
    class MyDB extends SQLite3 {
       function __construct() {
          $this->open('test.db');
@@ -64,6 +66,8 @@ EOF;
         <label for="password">Parole:</label>
         <input type="password" id="password" name="password" placeholder="Parole" required><br>
 
+        <input type="checkbox" name="rememberme" value="1"> Atcerēties mani
+
         <button type="submit" name="submit">Login</button>
 
 
@@ -72,6 +76,7 @@ EOF;
 
 <?php 
 
+$loggedIn = false;
 
 
 
@@ -80,23 +85,66 @@ EOF;
     $password = $_POST['password'];
     
       $stmt = $db->prepare('SELECT * FROM LOGININFO WHERE EMAIl = :email');
-      $stmt->bindParam(':email', $email);
+      $stmt->bindValue(':email', $email);
           $result = $stmt->execute();
             $row = $result->fetchArray(SQLITE3_ASSOC);
        
 if ($row) {
   
         if (password_verify($password, $row['PASSWORD'])) {
-            header("Location:products.php");
+            $loggedIn = true;
         } else {
             echo "Nepareizs epasts vai parole";
+            $loggedIn = false;
         }
     } else {
         echo "Nepareizs epasts vai parole";
     }
 
-   $db->close();
  }
+   
+
+
+
+
+if ($loggedIn) {
+   if (!empty($_POST["rememberme"]))
+            {
+
+      
+                setcookie("user_login", $email, time() +
+                                    (10 * 365 * 24 * 60 * 60));
+
+         
+                setcookie("user_password", $row['PASSWORD'], time() +
+                                    (10 * 365 * 24 * 60 * 60));
+
+      
+                $_SESSION["password"] = $row['PASSWORD'];
+
+            }
+            else
+            {
+                if (isset($_COOKIE["user_login"]))
+                {
+                    setcookie("user_login", "");
+                }
+                if (isset($_COOKIE["user_password"]))
+                {
+                    setcookie("user_password", "");
+                }
+            }
+            header("location:products.php");
+        }
+        else
+        {
+            $message = "Invalid Login Credentials";
+        }
+
+
+
+   $db->close();
+ 
 
 
 

@@ -1,4 +1,19 @@
 <?php
+session_start();
+if (isset($_SESSION['password'])){
+header("location:products.php");
+}
+
+
+
+
+
+
+
+
+
+
+
    class MyDB extends SQLite3 {
       function __construct() {
          $this->open('test.db');
@@ -75,6 +90,7 @@ EOF;
 
 <label>Esi jau pierakstījies? Ej uz <a href="login.php">login</a></label>
 <?php 
+
 
 
 
